@@ -22,8 +22,22 @@ const accountSchema = new mongoose.Schema({
 
 const Account = mongoose.model('Account', accountSchema);
 
-router.get('/login', (req, res) => {
+router.post('/login', (req, res) => {
+    const { user_id, pw } = req.body;
+    if (!user_id || !pw)
+        return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
 
+    Account.findOne({ user_id, password: crypto.createHash('sha256').update(pw).digest('hex') })
+        .then(account => {
+            if (!account) {
+                return res.status(401).json({ error: '인증 실패: 잘못된 ID 또는 비밀번호입니다.' });
+            }
+            return res.status(200).json({ message: '로그인 성공', account });
+        })
+        .catch(err => {
+            if (!res.headersSent)
+                return res.status(500).json({ error: '로그인 과정에서 오류가 발생했습니다.', details: err });
+        });
 });
 
 router.post('/register', (req, res) => {
