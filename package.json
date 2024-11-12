@@ -1,21 +1,20 @@
 {
-  "name": "backend",
+  "name": "medimeal",
   "version": "1.0.0",
-  "description": "MediMeal backend",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "https://github.com/MediMeal/backend",
-  "author": "D3vle0",
-  "license": "MIT",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.6.1",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "mongoose": "^8.8.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-naver": "^1.0.6"
   }
 }
