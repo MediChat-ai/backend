@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로필</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>프로필 정보</h1>
+        <div id="user-info"></div>
+        <a href="/" class="btn">홈으로 돌아가기</a>
+    </div>
+    <script>
+        // 사용자 정보를 가져와서 표시하는 스크립트
+        fetch('/profile')
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('네트워크 응답이 좋지 않습니다.');
+                }
+            })
+            .then(data => {
+                const userInfoDiv = document.getElementById('user-info');
+                userInfoDiv.innerHTML = `
+                    <p><strong>이름:</strong> ${data.user_name}</p>
+                    <p><strong>이메일:</strong> ${data.email}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('문제가 발생했습니다:', error);
+                document.getElementById('user-info').innerHTML = '<p>사용자 정보를 불러오는 데 문제가 발생했습니다.</p>';
+            });
+    </script>
+</body>
+</html>
