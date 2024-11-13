@@ -11,6 +11,7 @@
   "author": "D3vle0",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.7.7",
     "body-parser": "^1.20.3",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
