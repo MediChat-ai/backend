@@ -1,5 +1,3 @@
-// backend/app.js
-
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -10,7 +8,6 @@ const usersRouter = require('./routes/users');
 const connectDB = require('./db/connect');
 const crypto = require('crypto');
 require('dotenv').config();
-require('./config/passport-setup'); // Passport 설정
 
 const app = express();
 
