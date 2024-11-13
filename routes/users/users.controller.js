@@ -20,7 +20,7 @@ exports.login = (req, res) => {
 			if (!res.headersSent)
 				return res.status(500).json({ error: '로그인 과정에서 오류가 발생했습니다.', details: err });
 		});
-}
+};
 
 exports.register = (req, res) => {
 	const { user_id, user_name, pw } = req.body;
@@ -44,7 +44,7 @@ exports.register = (req, res) => {
 			if (!res.headersSent)
 				return res.status(500).json({ error: '계정 생성 과정에서 오류가 발생했습니다.', details: err });
 		});
-}
+};
 
 exports.auth = (req, res) => {
 	const { token } = req.body;
@@ -66,4 +66,4 @@ exports.auth = (req, res) => {
 					return res.status(500).json({ error: '사용자 조회 과정에서 오류가 발생했습니다.', details: err });
 			});
 	});
-}
+};
