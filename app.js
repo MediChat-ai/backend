@@ -4,8 +4,8 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const connectDB = require('./db/connect');
 
-const port = 3000;
-app.use(express.json()); // JSON 파싱 미들웨어
+const port = 3001;
+app.use(express.json());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 connectDB()
