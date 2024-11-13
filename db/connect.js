@@ -1,12 +1,15 @@
+// backend/connect.js
+
 const mongoose = require('mongoose');
 
-const connectDB = () => {
-  return mongoose.connect('mongodb://localhost:27017/medimeal', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI); // 옵션 없음
+        console.log('MongoDB connected');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+        process.exit(1); // 연결 실패 시 프로세스 종료
+    }
 };
 
 module.exports = connectDB;

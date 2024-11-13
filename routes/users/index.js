@@ -1,16 +1,11 @@
-// backend/routes/users/index.js
+const router = require("express").Router()
+const userController = require("./users.controller")
+const change = require("./change");
 
-const express = require('express');
-const router = express.Router();
-const accountController = require('./users.controller');
+router.use("/change", change);
 
-// 사용자 관련 라우트
-router.post('/login', accountController.login);
-router.post('/register', accountController.register);
-router.post('/auth', accountController.auth);
+router.post("/login", userController.login)
+router.post("/register", userController.register)
+router.post("/auth", userController.auth)
 
-// Google OAuth 라우트
-router.get('/auth/google', accountController.googleAuth); // Google 로그인 요청
-router.get('/auth/google/callback', accountController.googleAuthCallback); // Google 로그인 콜백
-
-module.exports = router;
+module.exports = router
