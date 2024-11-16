@@ -1,0 +1,12 @@
+const router = require("express").Router();
+const communityController = require("./community.controller");
+// const oauth = require("./oauth");
+
+// router.use("/change", change);
+// router.use("/oauth", oauth);
+
+router.post("/createBoard", communityController.createBoard);
+// router.post("/register", userController.register);
+// router.post("/auth", userController.auth);
+
+module.exports = router;

@@ -32,8 +32,8 @@ exports.register = (req, res) => {
 	const { user_id, user_name, pw } = req.body;
 	if (!user_id || !user_name || !pw)
 		return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
-	if (!validateUsername(user_id) || !validateUsername(user_name))
-		return res.status(400).json({ error: '아이디와 닉네임은 영문자와 숫자만 가능합니다.'});
+	// if (!validateUsername(user_id) || !validateUsername(user_name))
+	// 	return res.status(400).json({ error: '아이디와 닉네임은 영문자와 숫자만 가능합니다.'});
 	// 중복된 user_id 확인
 	Account.findOne({ user_id })
 		.then(existingAccount => {
