@@ -6,6 +6,7 @@ const communityController = require("./community.controller");
 // router.use("/oauth", oauth);
 
 router.post("/createBoard", communityController.createBoard);
+router.post("/write", communityController.write);
 // router.post("/register", userController.register);
 // router.post("/auth", userController.auth);
 
