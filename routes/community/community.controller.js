@@ -66,3 +66,38 @@ exports.write = async (req, res) => {
     return res.status(500).json({ error: '게시글 생성 과정에서 오류가 발생했습니다.', details: err });
   }
 };
+
+exports.comment = async (req, res) => {
+  try {
+    const { post_id, content, token } = req.body;
+    if (!post_id || !content || !token)
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+      try {
+        const post = await Post.findById(post_id);
+        if (!post)
+          return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+
+        const newComment = new Comment({
+          post_id: post_id,
+          author_id: decoded.user_id,
+          content: content,
+          created_at: new Date()
+        });
+
+        const savedComment = await newComment.save();
+        return res.status(200).json({ message: '댓글이 작성되었습니다.', comment: savedComment });
+      }
+      catch (err) {
+        console.error('댓글 생성 실패:', err);
+        return res.status(500).json({ error: '댓글 생성 과정에서 오류가 발생했습니다.', details: err });
+      }
+    });
+  } catch (err) {
+    console.error('댓글 생성 실패:', err);
+    return res.status(500).json({ error: '댓글 생성 과정에서 오류가 발생했습니다.', details: err });
+  }
+}

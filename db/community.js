@@ -22,7 +22,7 @@ const postSchema = new mongoose.Schema({
   board_name: { type: String, required: true },
   post_title: { type: String, required: true },
   post_content: { type: String, required: true },
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }], // 댓글 참조
+  // comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }], // 댓글 참조
   created_at: { type: Date, default: Date.now },
 });
 
