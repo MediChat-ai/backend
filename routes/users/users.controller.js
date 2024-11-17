@@ -23,17 +23,17 @@ exports.login = (req, res) => {
 		});
 };
 
-const validateUsername = username => {
-  const regex = /^[a-zA-Z0-9]+$/; // 영문자와 숫자만 허용
-  return regex.test(username);
+const validateUserId = username => {
+	const regex = /^[a-zA-Z0-9]+$/; // 영문자와 숫자만 허용
+	return regex.test(username);
 }
 
 exports.register = (req, res) => {
-	const { user_id, user_name, pw } = req.body;
-	if (!user_id || !user_name || !pw)
+	const { user_id, user_name, pw, auth_provider } = req.body;
+	if (!user_id || !user_name || !pw || !auth_provider)
 		return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
-	// if (!validateUsername(user_id) || !validateUsername(user_name))
-	// 	return res.status(400).json({ error: '아이디와 닉네임은 영문자와 숫자만 가능합니다.'});
+	if (!validateUserId(user_id) && auth_provider === 'local')
+		return res.status(400).json({ error: '아이디는 영문자와 숫자만 가능합니다.' });
 	// 중복된 user_id 확인
 	Account.findOne({ user_id })
 		.then(existingAccount => {
@@ -43,6 +43,7 @@ exports.register = (req, res) => {
 				user_id,
 				user_name,
 				created_at: new Date(),
+				auth_provider,
 				password: crypto.createHash('sha256').update(pw).digest('hex')
 			}).save();
 		})
