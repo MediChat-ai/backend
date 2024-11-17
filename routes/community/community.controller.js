@@ -101,3 +101,50 @@ exports.comment = async (req, res) => {
     return res.status(500).json({ error: '댓글 생성 과정에서 오류가 발생했습니다.', details: err });
   }
 }
+
+exports.deletePost = async (req, res) => {
+  try {
+    const { post_id, token } = req.body;
+    if (!post_id || !token)
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+
+      const post = await Post.findById(post_id);
+      if (!post)
+        return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+
+      await Post.findByIdAndDelete(post_id);
+      return res.status(200).json({ message: '게시글이 삭제되었습니다.' });
+    });
+  } catch (err) {
+    console.error('게시글 삭제 실패:', err);
+    return res.status(500).json({ error: '게시글 삭제 과정에서 오류가 발생했습니다.', details: err });
+  }
+}
+
+exports.deleteComment = async (req, res) => {
+  try {
+    const { comment_id, token } = req.body;
+    if (!comment_id || !token)
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+
+      const comment = await Comment.findById(comment_id);
+      if (!comment)
+        return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
+
+      await Comment.findByIdAndDelete(comment_id);
+
+      return res.status(200).json({ message: '댓글이 삭제되었습니다.' });
+    });
+  } catch (err) {
+    console.error('댓글 삭제 실패:', err);
+    return res.status(500).json({ error: '댓글 삭제 과정에서 오류가 발생했습니다.', details: err });
+  }
+}
