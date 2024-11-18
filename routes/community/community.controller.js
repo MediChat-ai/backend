@@ -199,3 +199,48 @@ exports.editComment = async (req, res) => {
     return res.status(500).json({ error: '댓글 수정 과정에서 오류가 발생했습니다.', details: err });
   }
 }
+
+exports.getBoardList = async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token || !token.startsWith('Bearer '))
+      return res.status(401).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    const jwtToken = token.split(' ')[1];
+    console.log(jwtToken)
+    jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+      const boards = await Board.find();
+      if (!boards || boards.length === 0)
+        return res.status(404).json({ error: '게시판 목록을 찾을 수 없습니다.' });
+
+      return res.status(200).json({ message: '게시판 목록을 성공적으로 불러왔습니다.', boards });
+    });
+  } catch (err) {
+    console.error('게시판 목록 불러오기 실패:', err);
+    return res.status(500).json({ error: '게시판 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+  }
+}
+
+exports.getPostList = async (req, res) => {
+  try {
+    const { board_name, token } = req.body;
+    if (!board_name || !token)
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+      const board = await Board.findOne({ name: board_name });
+      if (!board)
+        return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
+      const posts = await Post.find({ board_name });
+      return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', posts });
+    });
+
+  } catch (err) {
+    console.error('게시물 목록 불러오기 실패:', err);
+    return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+  }
+}

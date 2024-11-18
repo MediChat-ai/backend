@@ -12,6 +12,8 @@ router.post("/deletePost", communityController.deletePost);
 router.post("/deleteComment", communityController.deleteComment);
 router.post("/editPost", communityController.editPost);
 router.post("/editComment", communityController.editComment);
+router.get("/getBoardList", communityController.getBoardList);
+router.post("/getPostList", communityController.getPostList);
 // router.post("/register", userController.register);
 // router.post("/auth", userController.auth);
 
