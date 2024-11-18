@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const Account = require('../../db/account');
@@ -13,6 +12,8 @@ exports.login = (req, res) => {
 		.then(account => {
 			if (!account)
 				return res.status(401).json({ error: '인증 실패: 잘못된 ID 또는 비밀번호입니다.' });
+			if (account.auth_provider !== 'local')
+				return res.status(400).json({ error: '잘못된 접근입니다.' });
 			const token = jwt.sign({ user_id: account.user_id, user_name: account.user_name }, process.env.JWT_SECRET, { expiresIn: '24h' });
 			const { password, ...accountWithoutPassword } = account.toObject(); // 비밀번호를 제외한 계정 정보
 			return res.status(200).json({ message: '로그인 성공', token, account: accountWithoutPassword });
@@ -34,6 +35,8 @@ exports.register = (req, res) => {
 		return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
 	if (!validateUserId(user_id) && auth_provider === 'local')
 		return res.status(400).json({ error: '아이디는 영문자와 숫자만 가능합니다.' });
+	if (auth_provider !== 'local')
+		return res.status(400).json({ error: '잘못된 접근입니다.' });
 	// 중복된 user_id 확인
 	Account.findOne({ user_id })
 		.then(existingAccount => {
