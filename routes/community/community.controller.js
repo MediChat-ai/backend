@@ -22,7 +22,7 @@ exports.createBoard = async (req, res) => {
             }).save();
           })
           .then(savedBoard => {
-            return res.status(200).json({ message: '계정이 생성되었습니다.', board: savedBoard });
+            return res.status(200).json({ message: '게시판이 생성되었습니다.', board: savedBoard });
           })
           .catch(err => {
             if (!res.headersSent)
