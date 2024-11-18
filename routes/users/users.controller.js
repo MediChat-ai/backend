@@ -15,8 +15,7 @@ exports.login = (req, res) => {
 			if (account.auth_provider !== 'local')
 				return res.status(400).json({ error: '잘못된 접근입니다.' });
 			const token = jwt.sign({ user_id: account.user_id, user_name: account.user_name }, process.env.JWT_SECRET, { expiresIn: '24h' });
-			const { password, ...accountWithoutPassword } = account.toObject(); // 비밀번호를 제외한 계정 정보
-			return res.status(200).json({ message: '로그인 성공', token, account: accountWithoutPassword });
+			return res.status(200).json({ message: '로그인 성공', token: token });
 		})
 		.catch(err => {
 			if (!res.headersSent)
@@ -50,9 +49,8 @@ exports.register = (req, res) => {
 				password: crypto.createHash('sha256').update(pw).digest('hex')
 			}).save();
 		})
-		.then(savedAccount => {
-			const { password, ...accountWithoutPassword } = savedAccount.toObject(); // 비밀번호를 제외한 계정 정보
-			return res.status(200).json({ message: '계정이 생성되었습니다.', account: accountWithoutPassword });
+		.then(() => {
+			return res.status(200).json({ message: '계정이 생성되었습니다.' });
 		})
 		.catch(err => {
 			if (!res.headersSent)
@@ -73,8 +71,7 @@ exports.auth = (req, res) => {
 				if (!account)
 					return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
 
-				const { password, ...accountWithoutPassword } = account.toObject(); // 비밀번호를 제외한 계정 정보
-				return res.status(200).json({ message: '인증 성공', account: accountWithoutPassword });
+				return res.status(200).json({ message: '인증 성공' });
 			})
 			.catch(err => {
 				if (!res.headersSent)
