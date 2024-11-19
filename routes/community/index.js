@@ -1,20 +1,15 @@
 const router = require("express").Router();
 const communityController = require("./community.controller");
-// const oauth = require("./oauth");
-
-// router.use("/change", change);
-// router.use("/oauth", oauth);
 
 router.post("/createBoard", communityController.createBoard);
-router.post("/write", communityController.write);
-router.post("/comment", communityController.comment);
-router.post("/deletePost", communityController.deletePost);
-router.post("/deleteComment", communityController.deleteComment);
-router.post("/editPost", communityController.editPost);
-router.post("/editComment", communityController.editComment);
 router.get("/getBoardList", communityController.getBoardList);
-router.post("/getPostList", communityController.getPostList);
-// router.post("/register", userController.register);
-// router.post("/auth", userController.auth);
+router.get("/getPostList", communityController.getPostList);
+router.post("/writePost", communityController.writePost);
+router.put("/editPost", communityController.editPost);
+router.delete("/deletePost", communityController.deletePost);
+router.get('/getCommentList', communityController.getCommentList);
+router.post("/writeComment", communityController.writeComment);
+router.put("/editComment", communityController.editComment);
+router.delete("/deleteComment", communityController.deleteComment);
 
 module.exports = router;

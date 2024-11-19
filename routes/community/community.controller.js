@@ -36,7 +36,62 @@ exports.createBoard = async (req, res) => {
   }
 }
 
-exports.write = async (req, res) => {
+exports.getBoardList = async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token || !token.startsWith('Bearer '))
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    const jwtToken = token.split(' ')[1];
+    console.log(jwtToken)
+    jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+      const boards = await Board.find();
+      if (!boards || boards.length === 0)
+        return res.status(404).json({ error: '게시판 목록을 찾을 수 없습니다.' });
+
+      return res.status(200).json({ message: '게시판 목록을 성공적으로 불러왔습니다.', boards });
+    });
+  } catch (err) {
+    console.error('게시판 목록 불러오기 실패:', err);
+    return res.status(500).json({ error: '게시판 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+  }
+}
+
+exports.getPostList = async (req, res) => {
+  try {
+    const board_name = req.query.board_name;
+    console.log(board_name)
+    const token = req.headers.authorization;
+    if (!board_name || !token || !token.startsWith('Bearer '))
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    const jwtToken = token.split(' ')[1];
+    jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+      const board = await Board.findOne({ name: board_name });
+      if (!board)
+        return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
+      const posts = await Post.find({ board_name });
+      if (req.query.id) {
+        const postId = req.query.id;
+        const post = await Post.findById(postId);
+        if (!post)
+          return res.status(404).json({ error: '게시물을 찾을 수 없습니다.' });
+        return res.status(200).json({ message: '게시물을 성공적으로 불러왔습니다.', post });
+      }
+      return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', posts });
+    });
+
+  } catch (err) {
+    console.error('게시물 목록 불러오기 실패:', err);
+    return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+  }
+}
+
+exports.writePost = async (req, res) => {
   try {
     const { title, content, board_name, token } = req.body;
     if (!title || !content || !board_name || !token)
@@ -67,7 +122,83 @@ exports.write = async (req, res) => {
   }
 };
 
-exports.comment = async (req, res) => {
+exports.editPost = async (req, res) => {
+  try {
+    const { post_id, title, content, token } = req.body;
+    if (!post_id || !title || !content || !token)
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+
+      const post = await Post.findById(post_id);
+      if (!post)
+        return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+
+      post.post_title = title;
+      post.post_content = content;
+      const updatedPost = await post.save();
+
+      return res.status(200).json({ message: '게시글이 수정되었습니다.', post: updatedPost });
+    });
+  } catch (err) {
+    console.error('게시글 수정 실패:', err);
+    return res.status(500).json({ error: '게시글 수정 과정에서 오류가 발생했습니다.', details: err });
+  }
+}
+
+exports.deletePost = async (req, res) => {
+  try {
+    const { post_id, token } = req.body;
+    if (!post_id || !token)
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+
+      const post = await Post.findById(post_id);
+      if (!post)
+        return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+
+      await Post.findByIdAndDelete(post_id);
+      return res.status(200).json({ message: '게시글이 삭제되었습니다.' });
+    });
+  } catch (err) {
+    console.error('게시글 삭제 실패:', err);
+    return res.status(500).json({ error: '게시글 삭제 과정에서 오류가 발생했습니다.', details: err });
+  }
+}
+
+exports.getCommentList = async (req, res) => {
+  try {
+    const postId = req.query.post_id;
+    const token = req.headers.authorization;
+    if (!postId || !token || !token.startsWith('Bearer '))
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+
+    const jwtToken = token.split(' ')[1];
+    jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+      try {
+        const comments = await Comment.find({ post_id: postId });
+        if (!comments)
+          return res.status(404).json({ error: '게시물을 찾을 수 없습니다.' });
+        return res.status(200).json({ message: '댓글 목록을 성공적으로 불러왔습니다.', comments });
+      } catch (err) {
+        console.error('댓글 목록 불러오기 실패:', err);
+        return res.status(500).json({ error: '댓글 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+      }
+    });
+  } catch (err) {
+    console.error('댓글 목록 불러오기 실패:', err);
+    return res.status(500).json({ error: '댓글 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+  }
+}
+
+exports.writeComment = async (req, res) => {
   try {
     const { post_id, content, token } = req.body;
     if (!post_id || !content || !token)
@@ -102,79 +233,6 @@ exports.comment = async (req, res) => {
   }
 }
 
-exports.deletePost = async (req, res) => {
-  try {
-    const { post_id, token } = req.body;
-    if (!post_id || !token)
-      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
-
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-      if (err)
-        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
-
-      const post = await Post.findById(post_id);
-      if (!post)
-        return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
-
-      await Post.findByIdAndDelete(post_id);
-      return res.status(200).json({ message: '게시글이 삭제되었습니다.' });
-    });
-  } catch (err) {
-    console.error('게시글 삭제 실패:', err);
-    return res.status(500).json({ error: '게시글 삭제 과정에서 오류가 발생했습니다.', details: err });
-  }
-}
-
-exports.deleteComment = async (req, res) => {
-  try {
-    const { comment_id, token } = req.body;
-    if (!comment_id || !token)
-      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
-
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-      if (err)
-        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
-
-      const comment = await Comment.findById(comment_id);
-      if (!comment)
-        return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
-
-      await Comment.findByIdAndDelete(comment_id);
-
-      return res.status(200).json({ message: '댓글이 삭제되었습니다.' });
-    });
-  } catch (err) {
-    console.error('댓글 삭제 실패:', err);
-    return res.status(500).json({ error: '댓글 삭제 과정에서 오류가 발생했습니다.', details: err });
-  }
-}
-
-exports.editPost = async (req, res) => {
-  try {
-    const { post_id, title, content, token } = req.body;
-    if (!post_id || !title || !content || !token)
-      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
-
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-      if (err)
-        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
-
-      const post = await Post.findById(post_id);
-      if (!post)
-        return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
-
-      post.post_title = title;
-      post.post_content = content;
-      const updatedPost = await post.save();
-
-      return res.status(200).json({ message: '게시글이 수정되었습니다.', post: updatedPost });
-    });
-  } catch (err) {
-    console.error('게시글 수정 실패:', err);
-    return res.status(500).json({ error: '게시글 수정 과정에서 오류가 발생했습니다.', details: err });
-  }
-}
-
 exports.editComment = async (req, res) => {
   try {
     const { comment_id, content, token } = req.body;
@@ -200,47 +258,26 @@ exports.editComment = async (req, res) => {
   }
 }
 
-exports.getBoardList = async (req, res) => {
+exports.deleteComment = async (req, res) => {
   try {
-    const token = req.headers.authorization;
-    if (!token || !token.startsWith('Bearer '))
-      return res.status(401).json({ error: '필수 파라미터 값이 누락되었습니다.' });
-
-    const jwtToken = token.split(' ')[1];
-    console.log(jwtToken)
-    jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, decoded) => {
-      if (err)
-        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
-      const boards = await Board.find();
-      if (!boards || boards.length === 0)
-        return res.status(404).json({ error: '게시판 목록을 찾을 수 없습니다.' });
-
-      return res.status(200).json({ message: '게시판 목록을 성공적으로 불러왔습니다.', boards });
-    });
-  } catch (err) {
-    console.error('게시판 목록 불러오기 실패:', err);
-    return res.status(500).json({ error: '게시판 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
-  }
-}
-
-exports.getPostList = async (req, res) => {
-  try {
-    const { board_name, token } = req.body;
-    if (!board_name || !token)
+    const { comment_id, token } = req.body;
+    if (!comment_id || !token)
       return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if (err)
         return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
-      const board = await Board.findOne({ name: board_name });
-      if (!board)
-        return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
-      const posts = await Post.find({ board_name });
-      return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', posts });
-    });
 
+      const comment = await Comment.findById(comment_id);
+      if (!comment)
+        return res.status(404).json({ error: '댓글을 찾을 수 없습니다.' });
+
+      await Comment.findByIdAndDelete(comment_id);
+
+      return res.status(200).json({ message: '댓글이 삭제되었습니다.' });
+    });
   } catch (err) {
-    console.error('게시물 목록 불러오기 실패:', err);
-    return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+    console.error('댓글 삭제 실패:', err);
+    return res.status(500).json({ error: '댓글 삭제 과정에서 오류가 발생했습니다.', details: err });
   }
 }
