@@ -59,11 +59,12 @@ exports.register = (req, res) => {
 };
 
 exports.auth = (req, res) => {
-	const { token } = req.body;
-	if (!token)
-		return res.status(400).json({ error: '토큰이 누락되었습니다.' });
+	const token = req.headers.authorization;
+    if (!token || !token.startsWith('Bearer '))
+      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+	const jwtToken = token.split(' ')[1];
 
-	jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+	jwt.verify(jwtToken, process.env.JWT_SECRET, (err, decoded) => {
 		if (err)
 			return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
 		Account.findOne({ user_id: decoded.user_id })

@@ -8,6 +8,6 @@ router.use("/oauth", oauth);
 
 router.post("/login", userController.login);
 router.post("/register", userController.register);
-router.post("/auth", userController.auth);
+router.get("/auth", userController.auth);
 
 module.exports = router;
