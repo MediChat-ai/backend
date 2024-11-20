@@ -76,8 +76,10 @@ exports.getPostList = async (req, res) => {
         const posts = await Post.find({ board_id: board_id });
         if (!posts || posts.length === 0)
           return res.status(404).json({ error: '게시물 목록을 찾을 수 없습니다.' });
-
-        return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', posts });
+        const board = await Board.findById(board_id);
+        if (!board)
+          return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
+        return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', board_name: board.name, posts: posts.reverse() });
       } catch (err) {
         console.error('게시물 목록 불러오기 실패:', err);
         return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
