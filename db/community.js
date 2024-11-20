@@ -20,9 +20,10 @@ const Comment = mongoose.model('Comment', commentSchema);
 
 const postSchema = new mongoose.Schema({
   author_id: { type: String, required: true },
-  board_name: { type: String, required: true },
+  board_id: { type: String, required: true },
   post_title: { type: String, required: true },
   post_content: { type: String, required: true },
+  view_count: { type: Number, default: 0 },
   // comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }], // 댓글 참조
   created_at: { type: Date, default: Date.now },
 });
