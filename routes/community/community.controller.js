@@ -62,28 +62,33 @@ exports.getBoardList = async (req, res) => {
 
 exports.getPostList = async (req, res) => {
   try {
-    const board_name = req.query.board_name;
-    console.log(board_name)
+    const board_id = req.query.board_id;
+    console.log(board_id)
     const token = req.headers.authorization;
-    if (!board_name || !token || !token.startsWith('Bearer '))
+    if (!board_id || !token || !token.startsWith('Bearer '))
       return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
 
     const jwtToken = token.split(' ')[1];
     jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, decoded) => {
-      if (err)
-        return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
-      const board = await Board.findOne({ name: board_name });
-      if (!board)
-        return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
-      const posts = await Post.find({ board_name });
-      if (req.query.id) {
-        const postId = req.query.id;
-        const post = await Post.findById(postId);
-        if (!post)
-          return res.status(404).json({ error: '게시물을 찾을 수 없습니다.' });
-        return res.status(200).json({ message: '게시물을 성공적으로 불러왔습니다.', post });
+      try {
+        if (err)
+          return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
+        const board = await Board.findById(board_id);
+        if (!board)
+          return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
+        const posts = await Post.find({ board_name: board.name });
+        if (req.query.id) {
+          const postId = req.query.id;
+          const post = await Post.findById(postId);
+          if (!post)
+            return res.status(404).json({ error: '게시물을 찾을 수 없습니다.' });
+          return res.status(200).json({ message: '게시물을 성공적으로 불러왔습니다.', post });
+        }
+        return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', posts });
+      } catch (err) {
+        console.error('게시물 목록 불러오기 실패:', err);
+        return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
       }
-      return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', posts });
     });
 
   } catch (err) {
