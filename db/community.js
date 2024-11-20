@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const boardSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true }, // 게시판 이름
   description: { type: String }, // 게시판 설명
+  cover_url: { type: String },
   created_at: { type: Date, default: Date.now },
 });
 

@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 
 exports.createBoard = async (req, res) => {
   try {
-    const { board_name, description, token } = req.body;
-    if (!board_name || !description || !token)
+    const { board_name, description, token, cover_url } = req.body;
+    if (!board_name || !description || !token || !cover_url)
       return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err)
@@ -18,7 +18,8 @@ exports.createBoard = async (req, res) => {
             return new Board({
               name: board_name,
               description: description,
-              created_at: new Date()
+              created_at: new Date(),
+              cover_url: cover_url
             }).save();
           })
           .then(savedBoard => {
