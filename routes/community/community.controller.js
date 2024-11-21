@@ -44,7 +44,6 @@ exports.getBoardList = async (req, res) => {
       return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
 
     const jwtToken = token.split(' ')[1];
-    console.log(jwtToken)
     jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, decoded) => {
       if (err)
         return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
@@ -63,6 +62,7 @@ exports.getBoardList = async (req, res) => {
 exports.getPostList = async (req, res) => {
   try {
     const board_id = req.query.board_id;
+    const post_id = req.query.id;
     const token = req.headers.authorization;
     if (!board_id || !token || !token.startsWith('Bearer '))
       return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
@@ -73,13 +73,18 @@ exports.getPostList = async (req, res) => {
         if (err)
           return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
 
-        const posts = await Post.find({ board_id: board_id });
+        let posts;
+        if (post_id) {
+          posts = await Post.findById(post_id);
+        } else {
+          posts = await Post.find({ board_id: board_id });
+        }
         if (!posts || posts.length === 0)
           return res.status(404).json({ error: '게시물 목록을 찾을 수 없습니다.' });
         const board = await Board.findById(board_id);
         if (!board)
           return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
-        return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', board_name: board.name, posts: posts.reverse() });
+        return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', board_name: board.name, posts });
       } catch (err) {
         console.error('게시물 목록 불러오기 실패:', err);
         return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
@@ -107,7 +112,7 @@ exports.writePost = async (req, res) => {
             return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
 
           const newPost = new Post({
-            author_id: decoded.user_id,
+            author_name: decoded.user_name,
             post_title: title,
             post_content: content,
             board_id: board_id,
@@ -221,7 +226,7 @@ exports.writeComment = async (req, res) => {
 
         const newComment = new Comment({
           post_id: post_id,
-          author_id: decoded.user_id,
+          author_name: decoded.user_name,
           content: content,
           created_at: new Date()
         });

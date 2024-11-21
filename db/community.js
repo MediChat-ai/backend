@@ -11,7 +11,7 @@ const Board = mongoose.model('Board', boardSchema);
 
 const commentSchema = new mongoose.Schema({
   post_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true }, // 게시글 참조
-  author_id: { type: String, required: true }, // 작성자 ID
+  author_name: { type: String, required: true }, // 작성자 ID
   content: { type: String, required: true }, // 댓글 내용
   created_at: { type: Date, default: Date.now }, // 댓글 작성 시간
 });
@@ -19,7 +19,7 @@ const commentSchema = new mongoose.Schema({
 const Comment = mongoose.model('Comment', commentSchema);
 
 const postSchema = new mongoose.Schema({
-  author_id: { type: String, required: true },
+  author_name: { type: String, required: true },
   board_id: { type: String, required: true },
   post_title: { type: String, required: true },
   post_content: { type: String, required: true },
