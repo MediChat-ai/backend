@@ -76,6 +76,8 @@ exports.getPostList = async (req, res) => {
         let posts;
         if (post_id) {
           posts = await Post.findById(post_id);
+          posts.view_count += 1;
+          await posts.save();
         } else {
           posts = await Post.find({ board_id: board_id });
         }
