@@ -16,7 +16,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(session({
     secret: crypto.randomBytes(16).toString('base64'),
-    resave: false, saveUninitialized: true
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true, sameSite: 'none' }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
