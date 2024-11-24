@@ -14,7 +14,7 @@ exports.login = (req, res) => {
 				return res.status(401).json({ error: '인증 실패: 잘못된 ID 또는 비밀번호입니다.' });
 			if (account.auth_provider !== 'local')
 				return res.status(400).json({ error: '잘못된 접근입니다.' });
-			const token = jwt.sign({ user_id: account.user_id, user_name: account.user_name }, process.env.JWT_SECRET, { expiresIn: '24h' });
+			const token = jwt.sign({ user_id: account.user_id, user_name: account.user_name, auth_provider: account.auth_provider }, process.env.JWT_SECRET, { expiresIn: '24h' });
 			return res.status(200).json({ message: '로그인 성공', token: token });
 		})
 		.catch(err => {
@@ -60,8 +60,8 @@ exports.register = (req, res) => {
 
 exports.auth = (req, res) => {
 	const token = req.headers.authorization;
-    if (!token || !token.startsWith('Bearer '))
-      return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
+	if (!token || !token.startsWith('Bearer '))
+		return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
 	const jwtToken = token.split(' ')[1];
 
 	jwt.verify(jwtToken, process.env.JWT_SECRET, (err, decoded) => {

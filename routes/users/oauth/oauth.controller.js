@@ -2,6 +2,7 @@ const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const Account = require('../../../db/account');
 const axios = require('axios');
+const crypto = require('crypto');
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -27,7 +28,7 @@ exports.google = async (req, res) => {
       user = new Account({
         user_id: email,
         user_name: name,
-        password: OAUTH_PW,
+        password: crypto.createHash('sha256').update(OAUTH_PW).digest('hex'),
         auth_provider: 'google',
       });
 
@@ -35,7 +36,7 @@ exports.google = async (req, res) => {
     }
 
     const jwtToken = jwt.sign(
-      { user_id: user.user_id, user_name: user.user_name },
+      { user_id: user.user_id, user_name: user.user_name, auth_provider: user.auth_provider },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -65,7 +66,7 @@ exports.naver = async (req, res) => {
       user = new Account({
         user_id: userInfo.response.email,
         user_name: userInfo.response.nickname,
-        password: OAUTH_PW,
+        password: crypto.createHash('sha256').update(OAUTH_PW).digest('hex'),
         auth_provider: 'naver',
       });
 
@@ -73,7 +74,7 @@ exports.naver = async (req, res) => {
     }
 
     const jwtToken = jwt.sign(
-      { user_id: user.user_id, user_name: user.user_name },
+      { user_id: user.user_id, user_name: user.user_name, auth_provider: user.auth_provider },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
