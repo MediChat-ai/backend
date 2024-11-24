@@ -2,17 +2,10 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const Account = require('../../../db/account');
 
-const validateUsername = username => {
-  const regex = /^[a-zA-Z0-9]+$/; // 영문자와 숫자만 허용
-  return regex.test(username);
-}
-
 exports.username = (req, res) => {
   const { new_username, token } = req.body;
   if (!new_username || !token)
     return res.status(400).json({ error: '필수 파라미터 값이 누락되었습니다.' });
-  if (!validateUsername(new_username))
-    return res.status(400).json({ error: '닉네임은 영문자와 숫자만 가능합니다.' });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err)
