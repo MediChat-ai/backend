@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Account = require('../../../db/account');
 const axios = require('axios');
 const crypto = require('crypto');
+require('dotenv').config();
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const JWT_SECRET = process.env.JWT_SECRET;
