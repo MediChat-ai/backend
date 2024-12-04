@@ -50,7 +50,8 @@ exports.register = (req, res) => {
 			}).save();
 		})
 		.then(() => {
-			return res.status(200).json({ message: '계정이 생성되었습니다.' });
+			const token = jwt.sign({ user_id, user_name, auth_provider }, process.env.JWT_SECRET, { expiresIn: '24h' });
+			return res.status(200).json({ message: '계정이 생성되었습니다.', token: token });
 		})
 		.catch(err => {
 			if (!res.headersSent)
