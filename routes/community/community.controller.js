@@ -73,31 +73,35 @@ exports.getPostList = async (req, res) => {
         if (err)
           return res.status(401).json({ error: '유효하지 않은 토큰입니다.', details: err });
 
-        let posts;
+        let posts = [];
         if (post_id) {
           posts = await Post.findById(post_id);
-          posts.view_count += 1;
-          await posts.save();
+          if (posts) {
+            posts.view_count += 1;
+            await posts.save();
+            posts = [posts];
+          }
         } else {
           posts = await Post.find({ board_id: board_id });
         }
-        if (!posts || posts.length === 0)
-          return res.status(404).json({ error: '게시물 목록을 찾을 수 없습니다.' });
+
         const board = await Board.findById(board_id);
         if (!board)
           return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
-        return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', board_name: board.name, posts });
+        if (!posts || posts.length === 0) {
+          return res.status(200).json({ message: '게시물이 없습니다.', board_name: board.name, posts: [] });
+        }
+        return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', board_name: board.name, posts, });
       } catch (err) {
         console.error('게시물 목록 불러오기 실패:', err);
-        return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+        return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err, });
       }
     });
-
   } catch (err) {
     console.error('게시물 목록 불러오기 실패:', err);
-    return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err });
+    return res.status(500).json({ error: '게시물 목록을 불러오는 과정에서 오류가 발생했습니다.', details: err, });
   }
-}
+};
 
 exports.writePost = async (req, res) => {
   try {
