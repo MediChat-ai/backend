@@ -79,7 +79,6 @@ exports.getPostList = async (req, res) => {
           if (posts) {
             posts.view_count += 1;
             await posts.save();
-            posts = [posts];
           }
         } else {
           posts = await Post.find({ board_id: board_id });
@@ -89,7 +88,7 @@ exports.getPostList = async (req, res) => {
         if (!board)
           return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
         if (!posts || posts.length === 0) {
-          return res.status(200).json({ message: '게시물이 없습니다.', board_name: board.name, posts: [] });
+          return res.status(200).json({ message: '게시물이 없습니다.', board_name: board.name });
         }
         return res.status(200).json({ message: '게시물 목록을 성공적으로 불러왔습니다.', board_name: board.name, posts, });
       } catch (err) {
