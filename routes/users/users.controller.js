@@ -14,7 +14,7 @@ exports.login = (req, res) => {
 				return res.status(401).json({ error: '인증 실패: 잘못된 ID 또는 비밀번호입니다.' });
 			if (account.auth_provider !== 'local')
 				return res.status(400).json({ error: '잘못된 접근입니다.' });
-			const token = jwt.sign({ user_id: account.user_id, user_name: account.user_name, auth_provider: account.auth_provider }, process.env.JWT_SECRET, { expiresIn: '24h' });
+			const token = jwt.sign({ user_id: account.user_id, user_name: account.user_name, auth_provider: account.auth_provider }, process.env.JWT_SECRET);
 			return res.status(200).json({ message: '로그인 성공', token: token });
 		})
 		.catch(err => {
@@ -50,7 +50,7 @@ exports.register = (req, res) => {
 			}).save();
 		})
 		.then(() => {
-			const token = jwt.sign({ user_id, user_name, auth_provider }, process.env.JWT_SECRET, { expiresIn: '24h' });
+			const token = jwt.sign({ user_id, user_name, auth_provider }, process.env.JWT_SECRET);
 			return res.status(200).json({ message: '계정이 생성되었습니다.', token: token });
 		})
 		.catch(err => {

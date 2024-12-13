@@ -38,8 +38,7 @@ exports.google = async (req, res) => {
 
     const jwtToken = jwt.sign(
       { user_id: user.user_id, user_name: user.user_name, auth_provider: user.auth_provider },
-      JWT_SECRET,
-      { expiresIn: '24h' }
+      JWT_SECRET
     );
 
     return res.status(200).json({ token: jwtToken });
@@ -76,8 +75,7 @@ exports.naver = async (req, res) => {
 
     const jwtToken = jwt.sign(
       { user_id: user.user_id, user_name: user.user_name, auth_provider: user.auth_provider },
-      JWT_SECRET,
-      { expiresIn: '24h' }
+      JWT_SECRET
     );
 
     return res.status(200).json({ token: jwtToken });
