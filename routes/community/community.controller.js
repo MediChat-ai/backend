@@ -117,6 +117,7 @@ exports.writePost = async (req, res) => {
             return res.status(404).json({ error: '게시판을 찾을 수 없습니다.' });
 
           const newPost = new Post({
+            author_id: decoded.user_id,
             author_name: decoded.user_name,
             post_title: title,
             post_content: content,
@@ -231,6 +232,7 @@ exports.writeComment = async (req, res) => {
 
         const newComment = new Comment({
           post_id: post_id,
+          author_id: decoded.user_id,
           author_name: decoded.user_name,
           content: content,
           created_at: new Date()
