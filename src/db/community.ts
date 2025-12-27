@@ -58,3 +58,19 @@ const postSchema = new Schema<IPost>({
 });
 
 export const Post = mongoose.model<IPost>('Post', postSchema);
+
+export const ensureDefaultBoards = async (): Promise<void> => {
+  try {
+    const count = await Board.countDocuments();
+    if (count === 0) {
+      const defaultBoards = [
+        { name: '자유게시판', description: '자유롭게 소통하는 게시판입니다.', cover_url: '' },
+        { name: '질문게시판', description: '질문과 답변을 위한 게시판입니다.', cover_url: '' },
+      ];
+      await Board.insertMany(defaultBoards.map(b => ({ ...b, created_at: new Date() })));
+      console.log('Default boards created');
+    }
+  } catch (err) {
+    console.error('ensureDefaultBoards error:', err);
+  }
+};

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Board, Post, Comment } from '../../db';
+import { Board, Post, Comment, ensureDefaultBoards } from '../../db';
 import { verifyToken } from '../../utils';
 import { AuthRequest } from '../../types';
 
@@ -51,9 +51,11 @@ export const getBoardList = async (req: AuthRequest, res: Response): Promise<Res
       return res.status(401).json({ error: '유효하지 않은 토큰입니다.' });
     }
 
-    const boards = await Board.find();
+    let boards = await Board.find();
     if (!boards || boards.length === 0) {
-      return res.status(404).json({ error: '게시판 목록을 찾을 수 없습니다.' });
+      await ensureDefaultBoards();
+      boards = await Board.find();
+      return res.status(200).json({ message: '기본 게시판이 자동 생성되었습니다.', boards });
     }
 
     return res.status(200).json({ message: '게시판 목록을 성공적으로 불러왔습니다.', boards });
