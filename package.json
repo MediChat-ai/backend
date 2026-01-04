@@ -1,14 +1,14 @@
 {
   "name": "backend",
-  "version": "1.0.0",
-  "description": "MediMeal backend",
+  "version": "2.0.0",
+  "description": "Medichat backend",
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "tsx watch src/app.ts"
   },
-  "repository": "https://github.com/MediMeal/backend",
+  "repository": "https://github.com/MediChat-ai/backend",
   "author": "D3vle0",
   "license": "MIT",
   "dependencies": {

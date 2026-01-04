@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: medichat-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - medichat-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medichat-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/medichat?authSource=admin
+      - NODE_ENV=production
+    depends_on:
+      - mongodb
+    networks:
+      - medichat-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  medichat-network:
+    driver: bridge
