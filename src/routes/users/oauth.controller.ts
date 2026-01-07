@@ -2,13 +2,12 @@ import { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
 import { Account } from '../../db';
-import { signToken, hashPassword } from '../../utils';
+import { signToken } from '../../utils';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID as string;
-const OAUTH_PW = process.env.OAUTH_PW as string;
 const client = new OAuth2Client(CLIENT_ID);
 
 export const googleOAuth = async (req: Request, res: Response): Promise<Response> => {
@@ -32,7 +31,6 @@ export const googleOAuth = async (req: Request, res: Response): Promise<Response
       user = new Account({
         user_id: email,
         user_name: name,
-        password: hashPassword(OAUTH_PW),
         auth_provider: 'google',
       });
       await user.save();
@@ -68,7 +66,6 @@ export const naverOAuth = async (req: Request, res: Response): Promise<Response>
       user = new Account({
         user_id: email,
         user_name: nickname,
-        password: hashPassword(OAUTH_PW),
         auth_provider: 'naver',
       });
       await user.save();
