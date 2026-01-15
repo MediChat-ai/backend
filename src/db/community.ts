@@ -64,8 +64,8 @@ export const ensureDefaultBoards = async (): Promise<void> => {
     const count = await Board.countDocuments();
     if (count === 0) {
       const defaultBoards = [
-        { name: '자유게시판', description: '자유롭게 소통하는 게시판입니다.', cover_url: '' },
-        { name: '질문게시판', description: '질문과 답변을 위한 게시판입니다.', cover_url: '' },
+        { name: '자유게시판', description: '자유롭게 소통하는 게시판입니다.', cover_url: 'https://gov-web-sing.s3.ap-southeast-1.amazonaws.com/uploads/2023/1/Wordpress-featured-images-48-1672795987342.jpg' },
+        { name: '질문게시판', description: '질문과 답변을 위한 게시판입니다.', cover_url: 'https://insight.ieeeusa.org/wp-content/uploads/sites/2/2021/12/questions-1200-780x470.jpg' },
       ];
       await Board.insertMany(defaultBoards.map(b => ({ ...b, created_at: new Date() })));
       console.log('Default boards created');
