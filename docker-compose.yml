@@ -24,8 +24,8 @@ services:
       - PORT=3001
       - MONGODB_PORT=${MONGODB_PORT}
       - MONGODB_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@medichat-mongodb:${MONGODB_PORT}/medichat?authSource=admin
-      - HOSPITAL_API_KEY=
-      - GOOGLE_CLIENT_ID=
+      - HOSPITAL_API_KEY=${HOSPITAL_API_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - NODE_ENV=production
     depends_on:
       - mongodb
